@@ -8,7 +8,8 @@ defmodule ExCompact.Compactor do
     ExCompact.Patterns.ProcessCrash,
     ExCompact.Patterns.TestSummary,
     ExCompact.Patterns.CompilerWarning,
-    ExCompact.Patterns.EctoLog
+    ExCompact.Patterns.EctoLog,
+    ExCompact.Patterns.DbDisconnect
   ]
 
   def compact(text, opts \\ []) do

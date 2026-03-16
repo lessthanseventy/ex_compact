@@ -100,7 +100,7 @@ defmodule Mix.Tasks.ExCompact.Setup do
     File.mkdir_p!(@hooks_dir)
 
     for {src_name, dest_name} <- [
-          {"hooks/post_tool_use.sh", "ex_compact_post_tool_use.sh"},
+          {"hooks/pre_tool_use.sh", "ex_compact_pre_tool_use.sh"},
           {"hooks/user_prompt_submit.sh", "ex_compact_user_prompt_submit.sh"}
         ] do
       src = Path.join(dep_dir, src_name)
@@ -131,12 +131,12 @@ defmodule Mix.Tasks.ExCompact.Setup do
 
     hooks =
       hooks
-      |> add_hook("PostToolUse", %{
+      |> add_hook("PreToolUse", %{
         "matcher" => "Bash",
         "hooks" => [
           %{
             "type" => "command",
-            "command" => Path.join(@hooks_dir, "ex_compact_post_tool_use.sh")
+            "command" => Path.join(@hooks_dir, "ex_compact_pre_tool_use.sh")
           }
         ]
       })
