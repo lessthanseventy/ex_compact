@@ -13,7 +13,12 @@ defmodule ExCompact.Patterns.GenServerCrash do
     app = Keyword.get(opts, :app, :unknown)
     max_frames = Keyword.get(opts, :max_frames, 4)
 
-    Regex.replace(@crash_regex, text, fn _full, header, exception, frames_block, last_msg, state ->
+    Regex.replace(@crash_regex, text, fn _full,
+                                         header,
+                                         exception,
+                                         frames_block,
+                                         last_msg,
+                                         state ->
       frames = String.split(frames_block, "\n", trim: true)
 
       project_frames =

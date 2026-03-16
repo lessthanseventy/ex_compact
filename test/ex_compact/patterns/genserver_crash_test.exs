@@ -26,6 +26,7 @@ defmodule ExCompact.Patterns.GenServerCrashTest do
 
   test "truncates large state" do
     result = GenServerCrash.compact(@sample_crash, app: :my_app)
+
     if result =~ "State:" do
       state_line = result |> String.split("\n") |> Enum.find(&(&1 =~ "State:"))
       assert String.length(state_line) < 200

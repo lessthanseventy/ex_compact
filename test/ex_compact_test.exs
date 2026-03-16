@@ -17,6 +17,7 @@ defmodule ExCompactTest do
     Last message: :tick
     State: %{x: 1}
     """
+
     result = ExCompact.compact(input, app: :my_app)
     # Both patterns compacted
     assert result =~ "MyApp.Foo.bar/0"
@@ -52,6 +53,7 @@ defmodule ExCompactTest do
 
     Randomized with seed 12345
     """
+
     result = ExCompact.compact(input, [])
     # Failure preserved
     assert result =~ "test something (MyApp.FooTest)"
@@ -68,6 +70,7 @@ defmodule ExCompactTest do
         (my_app 0.1.0) lib/my_app/foo.ex:1: MyApp.Foo.bar/0
         (stdlib 5.0) gen_server.erl:100: :gen_server.handle_msg/6
     """
+
     result = ExCompact.compact(input, app: :my_app)
     refute result =~ "QUERY OK"
     assert result =~ "RuntimeError"

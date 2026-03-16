@@ -4,7 +4,12 @@ defmodule ExCompact.ClientTest do
   @socket_path "/tmp/ex_compact_client_test_#{System.pid()}.sock"
 
   test "falls back to inline when no daemon or project node" do
-    result = ExCompact.Client.compact("hello world", cwd: "/nonexistent", socket_path: "/nonexistent.sock")
+    result =
+      ExCompact.Client.compact("hello world",
+        cwd: "/nonexistent",
+        socket_path: "/nonexistent.sock"
+      )
+
     assert result == "hello world"
   end
 
@@ -28,6 +33,7 @@ defmodule ExCompact.ClientTest do
     SELECT u0."id" FROM "users" AS u0
     Important output
     """
+
     result = ExCompact.Client.compact(input, socket_path: @socket_path)
     refute result =~ "QUERY OK"
     assert result =~ "Important output"

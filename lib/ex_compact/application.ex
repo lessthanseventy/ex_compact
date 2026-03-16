@@ -10,6 +10,7 @@ defmodule ExCompact.Application do
       else
         []
       end
+
     opts = [strategy: :one_for_one, name: ExCompact.Supervisor]
     Supervisor.start_link(children, opts)
   end

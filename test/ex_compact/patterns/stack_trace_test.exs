@@ -40,6 +40,7 @@ defmodule ExCompact.Patterns.StackTraceTest do
         (stdlib 5.0) gen_server.erl:200: :gen_server.handle_msg/6
     Some output after
     """
+
     result = StackTrace.compact(input, app: :my_app)
     assert result =~ "** (ArgumentError)"
     assert result =~ "** (KeyError)"

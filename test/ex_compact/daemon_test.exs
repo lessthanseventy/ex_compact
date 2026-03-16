@@ -18,7 +18,10 @@ defmodule ExCompact.DaemonTest do
 
   test "accepts a connection and returns compacted text" do
     input = "Hello, normal text"
-    {:ok, socket} = :gen_tcp.connect({:local, @socket_path}, 0, [:binary, packet: 4, active: false], 5_000)
+
+    {:ok, socket} =
+      :gen_tcp.connect({:local, @socket_path}, 0, [:binary, packet: 4, active: false], 5_000)
+
     :ok = :gen_tcp.send(socket, input)
     {:ok, response} = :gen_tcp.recv(socket, 0, 5_000)
     :gen_tcp.close(socket)
@@ -31,7 +34,10 @@ defmodule ExCompact.DaemonTest do
     SELECT u0."id" FROM "users" AS u0
     Some important text
     """
-    {:ok, socket} = :gen_tcp.connect({:local, @socket_path}, 0, [:binary, packet: 4, active: false], 5_000)
+
+    {:ok, socket} =
+      :gen_tcp.connect({:local, @socket_path}, 0, [:binary, packet: 4, active: false], 5_000)
+
     :ok = :gen_tcp.send(socket, input)
     {:ok, response} = :gen_tcp.recv(socket, 0, 5_000)
     :gen_tcp.close(socket)

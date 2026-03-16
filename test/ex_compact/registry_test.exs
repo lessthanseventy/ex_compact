@@ -10,11 +10,11 @@ defmodule ExCompact.RegistryTest do
   end
 
   test "register and find a node" do
-    ExCompact.Registry.register("/home/user/my_project", :"myapp@localhost",
+    ExCompact.Registry.register("/home/user/my_project", :myapp@localhost,
       registry_path: @test_registry_path
     )
 
-    assert {:ok, :"myapp@localhost"} =
+    assert {:ok, :myapp@localhost} =
              ExCompact.Registry.find_node("/home/user/my_project",
                registry_path: @test_registry_path
              )
@@ -28,9 +28,7 @@ defmodule ExCompact.RegistryTest do
   end
 
   test "unregister removes entry" do
-    ExCompact.Registry.register("/home/user/proj", :"app@host",
-      registry_path: @test_registry_path
-    )
+    ExCompact.Registry.register("/home/user/proj", :app@host, registry_path: @test_registry_path)
 
     ExCompact.Registry.unregister("/home/user/proj",
       registry_path: @test_registry_path
