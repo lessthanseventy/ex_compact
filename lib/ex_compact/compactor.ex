@@ -5,6 +5,7 @@ defmodule ExCompact.Compactor do
     ExCompact.Patterns.StackTrace,
     ExCompact.Patterns.TestFailure,
     ExCompact.Patterns.GenServerCrash,
+    ExCompact.Patterns.ProcessCrash,
     ExCompact.Patterns.TestSummary,
     ExCompact.Patterns.CompilerWarning
   ]
