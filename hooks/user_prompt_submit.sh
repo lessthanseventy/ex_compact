@@ -2,15 +2,17 @@
 # Claude Code UserPromptSubmit hook — compacts pasted traces in user prompts
 set -euo pipefail
 
-input=$(cat)
+# Extract the user's prompt
+prompt=$(jq -r '.prompt // ""')
 
-user_message=$(echo "$input" | jq -r '.user_message // empty')
-if [ -z "$user_message" ]; then
+if [ -z "$prompt" ]; then
   exit 0
 fi
 
-compacted=$(echo "$user_message" | ex_compact compact 2>/dev/null) || exit 0
+# Compact via ex_compact (exit cleanly if ex_compact not found or fails)
+compacted=$(echo "$prompt" | ex_compact compact 2>/dev/null) || exit 0
 
-if [ "$compacted" != "$user_message" ]; then
-  echo "$input" | jq --arg msg "$compacted" '.user_message = $msg'
+# Only output if something changed
+if [ "$compacted" != "$prompt" ]; then
+  echo "$compacted" | jq -Rs '{"updatedPrompt": .}'
 fi

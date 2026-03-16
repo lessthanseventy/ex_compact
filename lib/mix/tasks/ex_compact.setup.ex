@@ -132,13 +132,22 @@ defmodule Mix.Tasks.ExCompact.Setup do
     hooks =
       hooks
       |> add_hook("PostToolUse", %{
-        "type" => "command",
-        "command" => Path.join(@hooks_dir, "ex_compact_post_tool_use.sh"),
-        "matcher" => %{"tool_name" => "Bash"}
+        "matcher" => "Bash",
+        "hooks" => [
+          %{
+            "type" => "command",
+            "command" => Path.join(@hooks_dir, "ex_compact_post_tool_use.sh")
+          }
+        ]
       })
       |> add_hook("UserPromptSubmit", %{
-        "type" => "command",
-        "command" => Path.join(@hooks_dir, "ex_compact_user_prompt_submit.sh")
+        "matcher" => "",
+        "hooks" => [
+          %{
+            "type" => "command",
+            "command" => Path.join(@hooks_dir, "ex_compact_user_prompt_submit.sh")
+          }
+        ]
       })
 
     updated = Map.put(settings, "hooks", hooks)
@@ -150,7 +159,13 @@ defmodule Mix.Tasks.ExCompact.Setup do
   defp add_hook(hooks, event, config) do
     existing = Map.get(hooks, event, [])
 
-    if Enum.any?(existing, fn h -> is_binary(h["command"]) and h["command"] =~ "ex_compact" end) do
+    already_configured? =
+      Enum.any?(existing, fn entry ->
+        inner_hooks = Map.get(entry, "hooks", [])
+        Enum.any?(inner_hooks, fn h -> is_binary(h["command"]) and h["command"] =~ "ex_compact" end)
+      end)
+
+    if already_configured? do
       Mix.shell().info("  #{event} hook already configured, skipping")
       hooks
     else
