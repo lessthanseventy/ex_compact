@@ -7,4 +7,4 @@ erl_crash.dump
 *.ez
 *.beam
 /tmp/
-ex_compact
+/ex_compact
