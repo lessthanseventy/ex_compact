@@ -5,8 +5,7 @@ defmodule ExCompact.Patterns.CompilerWarning do
   @impl true
   def compact(text, _opts) do
     if text =~ ~r/^warning: /m do
-      text
-      |> extract_and_compact_warnings()
+      extract_and_compact_warnings(text)
     else
       text
     end

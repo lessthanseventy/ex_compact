@@ -19,8 +19,7 @@ defmodule Mix.Tasks.ExCompact.Install do
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    igniter
-    |> Igniter.add_notice(install_message())
+    Igniter.add_notice(igniter, install_message())
   end
 
   defp install_message do

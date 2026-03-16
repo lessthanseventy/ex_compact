@@ -9,7 +9,7 @@ defmodule ExCompact.Patterns.StackTrace do
 
   @impl true
   def compact(text, opts) do
-    app = Keyword.get(opts, :app) |> detect_app()
+    app = opts |> Keyword.get(:app) |> detect_app()
     max_frames = Keyword.get(opts, :max_frames, 4)
 
     Regex.replace(@trace_regex, text, fn _full, exception_line, frames_block ->
