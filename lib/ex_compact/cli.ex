@@ -4,9 +4,11 @@ defmodule ExCompact.CLI do
   def main(args) do
     case parse_args(args) do
       :compact ->
-        input = IO.read(:stdio, :eof)
-        output = ExCompact.Client.compact(input)
-        IO.write(output)
+        case IO.read(:stdio, :eof) do
+          :eof -> :ok
+          {:error, _} -> :ok
+          input when is_binary(input) -> IO.write(ExCompact.Client.compact(input))
+        end
 
       {:daemon, :start} ->
         {:ok, _} = ExCompact.Daemon.start_link([])
