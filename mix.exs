@@ -24,7 +24,7 @@ defmodule ExCompact.MixProject do
 
   defp deps do
     [
-      {:igniter, "~> 0.7", only: [:dev]},
+      {:igniter, "~> 0.7", only: [:dev, :test]},
       {:usage_rules, "~> 1.1", only: [:dev]},
       {:jason, "~> 1.4"}
     ]
