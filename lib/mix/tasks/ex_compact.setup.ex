@@ -9,7 +9,7 @@ defmodule Mix.Tasks.ExCompact.Setup do
 
   ## What it does
 
-  1. Builds the `ex_compact` escript
+  1. Builds the `ex_compact` escript from the dep source
   2. Installs it to `~/.local/bin/` (override with `--bin-dir`)
   3. Copies hook scripts to `~/.claude/hooks/`
   4. Merges hook config into `~/.claude/settings.json`
@@ -28,14 +28,16 @@ defmodule Mix.Tasks.ExCompact.Setup do
     {opts, _, _} = OptionParser.parse(argv, strict: [bin_dir: :string])
     bin_dir = Keyword.get(opts, :bin_dir, @default_bin_dir)
 
-    build_escript()
+    dep_dir = find_dep_dir!()
+
+    escript_path = build_escript(dep_dir)
 
     if confirm("Install escript to #{bin_dir}/ex_compact?") do
-      install_escript(bin_dir)
+      install_escript(escript_path, bin_dir)
     end
 
     if confirm("Copy hook scripts to #{@hooks_dir}/?") do
-      copy_hooks()
+      copy_hooks(dep_dir)
     end
 
     if confirm("Add ex_compact hooks to #{@settings_path}?") do
@@ -45,35 +47,71 @@ defmodule Mix.Tasks.ExCompact.Setup do
     Mix.shell().info("\nDone!")
   end
 
-  defp confirm(question) do
-    Mix.shell().yes?(question)
+  defp find_dep_dir! do
+    # Check if we're running from the ex_compact project itself
+    if Mix.Project.config()[:app] == :ex_compact do
+      File.cwd!()
+    else
+      # Find the dep directory
+      deps_path = Mix.Project.deps_path()
+      dep_dir = Path.join(deps_path, "ex_compact")
+
+      if !File.dir?(dep_dir) do
+        Mix.raise("Could not find ex_compact dep at #{dep_dir}")
+      end
+
+      dep_dir
+    end
   end
 
-  defp build_escript do
-    Mix.shell().info("Building escript...")
-    Mix.Task.run("escript.build")
+  defp build_escript(dep_dir) do
+    Mix.shell().info("Building escript in #{dep_dir}...")
+
+    {output, exit_code} = System.cmd("mix", ["escript.build"], cd: dep_dir, stderr_to_stdout: true)
+
+    if exit_code != 0 do
+      Mix.raise("Failed to build escript:\n#{output}")
+    end
+
+    escript = Path.join(dep_dir, "ex_compact")
+
+    if !File.exists?(escript) do
+      Mix.raise("Escript not found at #{escript} after build")
+    end
+
+    escript
   end
 
-  defp install_escript(bin_dir) do
+  defp install_escript(escript_path, bin_dir) do
     File.mkdir_p!(bin_dir)
     dest = Path.join(bin_dir, "ex_compact")
-    File.cp!("ex_compact", dest)
+    File.cp!(escript_path, dest)
     File.chmod!(dest, 0o755)
     Mix.shell().info("  Installed #{dest}")
   end
 
-  defp copy_hooks do
+  defp copy_hooks(dep_dir) do
     File.mkdir_p!(@hooks_dir)
 
-    for {src, dest_name} <- [
+    for {src_name, dest_name} <- [
           {"hooks/post_tool_use.sh", "ex_compact_post_tool_use.sh"},
           {"hooks/user_prompt_submit.sh", "ex_compact_user_prompt_submit.sh"}
         ] do
+      src = Path.join(dep_dir, src_name)
       dest = Path.join(@hooks_dir, dest_name)
+
+      if !File.exists?(src) do
+        Mix.raise("Hook script not found at #{src}")
+      end
+
       File.cp!(src, dest)
       File.chmod!(dest, 0o755)
       Mix.shell().info("  Copied #{dest}")
     end
+  end
+
+  defp confirm(question) do
+    Mix.shell().yes?(question)
   end
 
   defp configure_settings do
