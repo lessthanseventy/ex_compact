@@ -52,15 +52,21 @@ defmodule Mix.Tasks.ExCompact.Setup do
     if Mix.Project.config()[:app] == :ex_compact do
       File.cwd!()
     else
-      # Find the dep directory
-      deps_path = Mix.Project.deps_path()
-      dep_dir = Path.join(deps_path, "ex_compact")
+      # Use Mix's dep metadata to find the source — works for path deps too
+      case Enum.find(Mix.Project.deps_paths(), fn {app, _path} -> app == :ex_compact end) do
+        {_app, path} ->
+          path
 
-      if !File.dir?(dep_dir) do
-        Mix.raise("Could not find ex_compact dep at #{dep_dir}")
+        nil ->
+          # Fallback: check standard deps dir
+          dep_dir = Path.join(Mix.Project.deps_path(), "ex_compact")
+
+          if !File.dir?(dep_dir) do
+            Mix.raise("Could not find ex_compact. Is it listed as a dependency in mix.exs?")
+          end
+
+          dep_dir
       end
-
-      dep_dir
     end
   end
 
