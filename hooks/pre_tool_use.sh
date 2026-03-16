@@ -11,8 +11,8 @@ if [ -z "$command" ]; then
   exit 0
 fi
 
-# Don't wrap if the command already uses ex_compact (avoid infinite loop)
-if echo "$command" | grep -q "ex_compact"; then
+# Don't wrap ex_compact or tmux commands
+if echo "$command" | grep -qE '(ex_compact|tmux|tmux-cli)'; then
   exit 0
 fi
 
