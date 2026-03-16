@@ -1,15 +1,21 @@
 defmodule Mix.Tasks.ExCompact.Install do
   @moduledoc """
-  Installs ex_compact: builds escript, copies hooks, configures Claude Code settings.
+  Installs ex_compact into the current project and optionally sets up Claude Code hooks.
 
       mix ex_compact.install
+      mix ex_compact.install --setup
+
+  Without `--setup`, only adds ex_compact as a dependency.
+  With `--setup`, also builds the escript, copies hooks to `~/.claude/hooks/`,
+  installs the escript to `~/.local/bin/`, and configures `~/.claude/settings.json`.
   """
   use Igniter.Mix.Task
 
   @impl Igniter.Mix.Task
   def info(_argv, _composing_task) do
     %Igniter.Mix.Task.Info{
-      schema: [],
+      schema: [setup: :boolean],
+      defaults: [setup: false],
       positional: [],
       composes: [],
       adds_deps: [],
@@ -19,45 +25,15 @@ defmodule Mix.Tasks.ExCompact.Install do
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    Igniter.add_notice(igniter, install_message())
-  end
-
-  defp install_message do
-    """
-    ex_compact setup:
-
-    1. Build the escript:
-       mix escript.build
-
-    2. Copy it to your PATH:
-       cp ex_compact ~/.local/bin/
-
-    3. Copy hook scripts:
-       mkdir -p ~/.claude/hooks
-       cp hooks/post_tool_use.sh ~/.claude/hooks/ex_compact_post_tool_use.sh
-       cp hooks/user_prompt_submit.sh ~/.claude/hooks/ex_compact_user_prompt_submit.sh
-
-    4. Add hooks to ~/.claude/settings.json (merge into existing):
-       {
-         "hooks": {
-           "PostToolUse": [
-             {
-               "type": "command",
-               "command": "~/.claude/hooks/ex_compact_post_tool_use.sh",
-               "matcher": {"tool_name": "Bash"}
-             }
-           ],
-           "UserPromptSubmit": [
-             {
-               "type": "command",
-               "command": "~/.claude/hooks/ex_compact_user_prompt_submit.sh"
-             }
-           ]
-         }
-       }
-
-    5. Start the daemon (optional, for faster response):
-       ex_compact daemon start
-    """
+    if igniter.args.options[:setup] do
+      igniter
+      |> Igniter.add_notice("Will build escript and configure Claude Code hooks after project changes.")
+      |> Igniter.add_task("ex_compact.setup", [])
+    else
+      Igniter.add_notice(
+        igniter,
+        "ex_compact added. Run `mix ex_compact.install --setup` to install the escript and Claude Code hooks."
+      )
+    end
   end
 end
